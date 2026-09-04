@@ -1,6 +1,6 @@
 local missions = require("missions")
 local mission = require(missions.CITY_TOWER_SOCIAL_D2)
-local lib = require("mission_lib")
+local lib = require("lib.mission_lib")
 
 -- Six bubbles, one authored state each, region = bubble * 8.
 -- Only the bubble the client holds may be entered; another arms a teleport.

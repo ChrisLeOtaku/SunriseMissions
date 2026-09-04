@@ -1,6 +1,6 @@
 -- Thieves' Landing, region 112. Owns this bubble's entities and its three public events.
 -- Only runnable squads may be named. The host refuses the rest and faults the callback.
-local lib = require("mission_lib")
+local lib = require("lib.mission_lib")
 
 return function(mission)
     local STATE = lib.one(mission.states.STATE_80FC9645_000E_0000_80FC95F2, "port state")

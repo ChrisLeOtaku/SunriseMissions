@@ -1,11 +1,11 @@
 local missions = require("missions")
 local mission = require(missions.TANGLED_SHORE_FREEROAM)
-local lib = require("mission_lib")
+local lib = require("lib.mission_lib")
 
 -- Owns the held bubble. Each bubble owns its own entities and events.
 local BUBBLES = {
-    [112] = require("tangled_shore_freeroam.port")(mission),
-    [168] = require("tangled_shore_freeroam.safehouse")(mission),
+    [112] = require("tangled_shore.port")(mission),
+    [168] = require("tangled_shore.safehouse")(mission),
 }
 
 -- Region order is fixed, so ipairs walks them. The sandbox has no pairs.

@@ -1,7 +1,7 @@
 local missions = require("missions")
 local mission = require(missions.TANGLED_SHORE_SOCIAL_SPACE)
-local lib = require("mission_lib")
-local spider_safehouse = require("spider_safehouse")
+local lib = require("lib.mission_lib")
+local spider_safehouse = require("tangled_shore.spider_safehouse")
 
 -- Spider's Safehouse as its own activity. One bubble, region 168.
 local SAFEHOUSE_REGION = 168

@@ -1,6 +1,6 @@
 -- Spider's safehouse, region 168. No timers, so no suspend and no resume.
-local lib = require("mission_lib")
-local spider_safehouse = require("spider_safehouse")
+local lib = require("lib.mission_lib")
+local spider_safehouse = require("tangled_shore.spider_safehouse")
 
 return function(mission)
     local build = spider_safehouse(

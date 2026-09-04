@@ -1,5 +1,5 @@
 -- Spider and Petra share one object. Both Tangled Shore activities build it from here.
-local lib = require("mission_lib")
+local lib = require("lib.mission_lib")
 
 --- @return A function that builds the safehouse under one authored state.
 return function(mission, state)

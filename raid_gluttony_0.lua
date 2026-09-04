@@ -1,6 +1,6 @@
 local missions = require("missions")
 local mission = require(missions.RAID_GLUTTONY_0)
-local lib = require("mission_lib")
+local lib = require("lib.mission_lib")
 
 -- Two authored states of one slice set: 0 playable, 1 the landing cutscene.
 -- Only a state change builds the cutscene's type-6 component.
