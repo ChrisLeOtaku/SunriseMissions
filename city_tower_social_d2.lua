@@ -16,6 +16,21 @@ local SEED_OMIT = {
 
 -- A repeated slot name carries its object tag, so each constant names one slot.
 -- A bubble's squads are the ones whose object sits in it. The client builds no vendor itself.
+local RETIRE_VENDOR_SQUADS = {
+    [mission.Squad.VENDOR_ZAVALA] = true,
+    [mission.Squad.SQ_GUNSMITH] = true,
+    [mission.Squad.SQ_VENDOR_CRYPTARCH] = true,
+    [mission.Squad.SQ_VENDOR_POSTMASTER] = true,
+    [mission.Squad.SQ_VENDOR_PVP] = true,
+    [mission.Squad.SQ_VENDOR_TES_EVERIS] = true,
+    [mission.Squad.SQ_VENDOR_HAWTHORNE] = true,
+    [mission.Squad.SQ_VENDOR_NEW_MONARCHY] = true,
+    [mission.Squad.SQ_VENDOR_AMANDA_HOLLIDAY] = true,
+    [mission.Squad.SQ_VENDOR_DEAD_ORBIT] = true,
+    [mission.Squad.SQ_VENDOR_FUTURE_WAR_CULT] = true,
+    [mission.Squad.SQ_ARMORY_VENDOR] = true,
+}
+
 local BUBBLES = {
     {
         -- courtyard, the arrival bubble
@@ -460,13 +475,18 @@ local function built_key(bubble)
 end
 
 -- Squads first, then the state: the rest binds under its lease.
--- A bubble is entered once. The roster keeps everything, so a return asks for nothing.
+-- Retained placement requests repopulate squads after their old entities retire.
 local function enter_bubble(context, state, bubble)
     if state:variable(built_key(bubble)) then
         return
     end
     context:set_variable(built_key(bubble), true)
-    lib.place_all(context, bubble.squads, context.sdk.squad_modes.reinforce)
+    for _, squad in ipairs(bubble.squads) do
+        context:squad(squad):place{
+            mode = context.sdk.squad_modes.reinforce,
+            retire_on_return = RETIRE_VENDOR_SQUADS[squad] == true,
+        }
+    end
     context:select_state(bubble.state, SEED_OMIT)
     lib.activate_objects(context, bubble.objects)
     lib.activate_scenes(context, bubble.scenes)
