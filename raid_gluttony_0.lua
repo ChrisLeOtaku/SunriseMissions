@@ -18,6 +18,7 @@ local PLAYING_KEY = "playing"
 local CINE_IDLE = 0
 local CINE_RUNNING = 1
 local CINE_DONE = 2
+local entry_transition_request
 
 local GUARD_SQUADS = lib.list(
     mission.Squad.SQ_BERTH_0_GUARD,
@@ -207,6 +208,11 @@ local function begin_entry_cinematic(context, state)
     context:slot(mission.Slot.PF_CINEMATIC_BOOKEND_CINEMATIC):set_cinematic_active{active = true}
 end
 
+local function request_playable(context)
+    entry_transition_request =
+        context:select_state(BERTH_PLAYABLE_STATE, {retire_placed_props = true})
+end
+
 local function end_entry_cinematic(context, state)
     if cinematic_phase(state) == CINE_DONE then
         return
@@ -215,7 +221,7 @@ local function end_entry_cinematic(context, state)
     -- Clear before the state change, or the rebuilt component replays the cutscene.
     context:slot(mission.Slot.PF_CINEMATIC_BOOKEND_CINEMATIC):set_cinematic_active{active = false}
     -- The state change also arms the teleport. Without the move no berth Auth can bind.
-    context:select_state(BERTH_PLAYABLE_STATE)
+    request_playable(context)
 end
 
 return {
@@ -229,7 +235,9 @@ return {
         -- The only start edge here: the client reports it holds the cutscene region.
         if event.region_index == BERTH_CINEMATIC_STATE.region_index then
             begin_entry_cinematic(context, state)
-        elseif event.region_index == BERTH_PLAYABLE_STATE.region_index then
+        end
+        if (event.held_region_index or event.current_region_index)
+            == BERTH_PLAYABLE_STATE.region_index then
             enter_playable(context, state)
         end
         -- The client zeroes its teleport byte inside the spawn call, so 0 marks the spawn.
@@ -250,9 +258,26 @@ return {
         -- End, skip and refused start all arrive here.
         end_entry_cinematic(context, state)
     end,
+    on_event_effect_result = function(context, state, event)
+        if not entry_transition_request or not event.request_key
+            or not event.request_key:matches(entry_transition_request) then
+            return
+        end
+        entry_transition_request = nil
+        if event.outcome == "refused" or event.outcome == "expired" then
+            -- A refused cleanup must not prevent the player from spawning.
+            context:select_state(BERTH_PLAYABLE_STATE)
+        end
+    end,
     on_load = function(context, state, event)
         -- A reattach lands in-world, so it must not replay the cutscene.
-        end_entry_cinematic(context, state)
+        if cinematic_phase(state) == CINE_DONE then
+            if not state:variable(BERTH_KEY) then
+                request_playable(context)
+            end
+        else
+            end_entry_cinematic(context, state)
+        end
     end,
     on_event_player_trigger = function(context, state, event)
         if lib.is_trigger(context, event, mission.Slot.PT_FRONT_DOOR,
