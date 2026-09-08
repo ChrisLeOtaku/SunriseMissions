@@ -1,0 +1,5 @@
+# Legacy Ember mission entry point
+/mission_ember.lua
+
+# Legacy Ember mission modules and all contents
+/mission_ember/
